@@ -56,8 +56,8 @@ func (s *Server) readLoop(conn net.Conn) {
 	for {
 		n, err := conn.Read(buf)
 		if err != nil {
-			fmt.Println("Read Loop Error", err)
-			continue
+			fmt.Printf("Read Loop Error - disconnected from %s : %s",conn.RemoteAddr(), err)
+			break
 		}
 		s.msgChan <- Message{
 			from:    conn.RemoteAddr().String(),
