@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+
+	playermodule "github.com/MultiGameServer/PlayerModule"
 )
 
 type Message struct {
@@ -53,11 +55,23 @@ func (s *Server) acceptLoop() {
 func (s *Server) readLoop(conn net.Conn) {
 	defer conn.Close()
 	buf := make([]byte, 2048)
+	n, err := conn.Read(buf)
+	if err != nil {
+		fmt.Printf("Read Error - disconnected from %s : %s", conn.RemoteAddr(), err)
+	}
+	sessionId := playermodule.GetSessionIdFromBuf(buf[:n])
+	playermodule.AllSessions.AddToSession(sessionId, conn.RemoteAddr())
 	for {
 		n, err := conn.Read(buf)
 		if err != nil {
-			fmt.Printf("Read Loop Error - disconnected from %s : %s",conn.RemoteAddr(), err)
+			fmt.Printf("Read Loop Error - disconnected from %s : %s", conn.RemoteAddr(), err)
 			break
+		}
+		matchSession := playermodule.AllSessions.GetSession(sessionId)
+		if matchSession.NetAddr[0].String() == conn.RemoteAddr().String(){
+			conn.Write([]byte(matchSession.PlayerPos[1]))
+		} else {
+			conn.Write([]byte(matchSession.PlayerPos[0]))
 		}
 		s.msgChan <- Message{
 			from:    conn.RemoteAddr().String(),
