@@ -64,10 +64,10 @@ func (s *Server) readLoop(conn net.Conn) {
 	for {
 		n, err := conn.Read(buf)
 		if err != nil {
-			fmt.Printf("Read Loop Error - disconnected from %s : %s", conn.RemoteAddr(), err)
+			fmt.Printf("Read Loop Error - disconnected from %s : %s\n", conn.RemoteAddr(), err)
 			break
 		}
-		fmt.Printf("Message from (%s): %s", conn.RemoteAddr(),string(buf[:n]))
+		fmt.Printf("Message from (%s): %s\n", conn.RemoteAddr(),string(buf[:n]))
 		matchSession := playermodule.AllSessions.GetSession(sessionId)
 		if matchSession.NetAddr[0].String() == conn.RemoteAddr().String(){
 			playermodule.AllSessions.UpdatePlayerPos(0,matchSession.PlayerPos[0],sessionId)
