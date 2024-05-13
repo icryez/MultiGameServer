@@ -67,10 +67,13 @@ func (s *Server) readLoop(conn net.Conn) {
 			fmt.Printf("Read Loop Error - disconnected from %s : %s", conn.RemoteAddr(), err)
 			break
 		}
+		fmt.Printf("Message from (%s): %s", conn.RemoteAddr(),string(buf[:n]))
 		matchSession := playermodule.AllSessions.GetSession(sessionId)
 		if matchSession.NetAddr[0].String() == conn.RemoteAddr().String(){
+			playermodule.AllSessions.UpdatePlayerPos(0,matchSession.PlayerPos[0],sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[1]))
 		} else {
+			playermodule.AllSessions.UpdatePlayerPos(1,matchSession.PlayerPos[1],sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[0]))
 		}
 		s.msgChan <- Message{
@@ -81,6 +84,7 @@ func (s *Server) readLoop(conn net.Conn) {
 }
 
 func main() {
+	playermodule.GenAllSessions()
 	server := NewServer(":3000")
 
 	go func() {

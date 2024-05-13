@@ -13,16 +13,16 @@ type Sessions struct {
 }
 
 type MatchSession struct {
-	NetAddr [2]net.Addr
+	NetAddr   [2]net.Addr
 	PlayerPos [2]string
 }
 
 var AllSessions Sessions
 
-func GenAllSessions(){
+func GenAllSessions() {
 
-		AllSessions = *new(Sessions)
-		AllSessions.sessions = make(map[string]MatchSession)
+	AllSessions = *new(Sessions)
+	AllSessions.sessions = make(map[string]MatchSession)
 }
 
 func (s *Sessions) AddToSession(sessionId string, playerAddr net.Addr) {
@@ -39,6 +39,16 @@ func (s *Sessions) AddToSession(sessionId string, playerAddr net.Addr) {
 	s.sessions[sessionId] = entry
 }
 
+func (s *Sessions) UpdatePlayerPos(index int, pos string, sessionId string) {
+	s.Lock()
+	defer s.Unlock()
+	s.Unlock()
+	matchSession := s.GetSession(sessionId)
+	s.Lock()
+	matchSession.PlayerPos[index] = pos
+	s.sessions[sessionId] = matchSession
+}
+
 func (s *Sessions) GetSession(sessionId string) MatchSession {
 	s.Lock()
 	defer s.Unlock()
@@ -49,7 +59,7 @@ func (s *Sessions) GetSession(sessionId string) MatchSession {
 	}
 }
 
-func GetSessionIdFromBuf(buf []byte) string{
+func GetSessionIdFromBuf(buf []byte) string {
 	str := string(buf)
 	str = strings.TrimSpace(str[0:5])
 	return str
