@@ -69,11 +69,12 @@ func (s *Server) readLoop(conn net.Conn) {
 		}
 		fmt.Printf("Message from (%s): %s\n", conn.RemoteAddr(),string(buf[:n]))
 		matchSession := playermodule.AllSessions.GetSession(sessionId)
+		playerPos := playermodule.GetPlayerPosFromBuf(buf)
 		if matchSession.NetAddr[0].String() == conn.RemoteAddr().String(){
-			playermodule.AllSessions.UpdatePlayerPos(0,matchSession.PlayerPos[0],sessionId)
+			playermodule.AllSessions.UpdatePlayerPos(0,playerPos,sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[1]))
 		} else {
-			playermodule.AllSessions.UpdatePlayerPos(1,matchSession.PlayerPos[1],sessionId)
+			playermodule.AllSessions.UpdatePlayerPos(1,playerPos,sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[0]))
 		}
 		// s.msgChan <- Message{

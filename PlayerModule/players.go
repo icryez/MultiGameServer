@@ -61,6 +61,9 @@ func (s *Sessions) GetSession(sessionId string) MatchSession {
 
 func GetSessionIdFromBuf(buf []byte) string {
 	str := string(buf)
-	str = strings.TrimSpace(str[0:5])
-	return str
+	return strings.TrimSpace(str[0:5])
+}
+func GetPlayerPosFromBuf(buf []byte) string{
+	str :=string(buf)
+	return strings.TrimSpace(str[6:])
 }
