@@ -64,30 +64,35 @@ func (s *Server) readLoop(conn net.Conn) {
 	for {
 		n, err := conn.Read(buf)
 		if err != nil {
-			fmt.Printf("Read Loop Error - disconnected from %s : %s", conn.RemoteAddr(), err)
+			fmt.Printf("Read Loop Error - disconnected from %s : %s\n", conn.RemoteAddr(), err)
 			break
 		}
+		fmt.Printf("Message from (%s): %s\n", conn.RemoteAddr(),string(buf[:n]))
 		matchSession := playermodule.AllSessions.GetSession(sessionId)
+		playerPos := playermodule.GetPlayerPosFromBuf(buf)
 		if matchSession.NetAddr[0].String() == conn.RemoteAddr().String(){
+			playermodule.AllSessions.UpdatePlayerPos(0,playerPos,sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[1]))
 		} else {
+			playermodule.AllSessions.UpdatePlayerPos(1,playerPos,sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[0]))
 		}
-		s.msgChan <- Message{
-			from:    conn.RemoteAddr().String(),
-			payload: buf[:n],
-		}
+		// s.msgChan <- Message{
+		// 	from:    conn.RemoteAddr().String(),
+		// 	payload: buf[:n],
+		// }
 	}
 }
 
 func main() {
+	playermodule.GenAllSessions()
 	server := NewServer(":3000")
 
-	go func() {
-		for msg := range server.msgChan {
-			fmt.Printf("Recieved message from connection (%s):%s\n", msg.from, string(msg.payload))
-		}
-	}()
+	// go func() {
+	// 	for msg := range server.msgChan {
+	// 		fmt.Printf("Recieved message from connection (%s):%s\n", msg.from, string(msg.payload))
+	// 	}
+	// }()
 
 	log.Fatal(server.Start())
 }
