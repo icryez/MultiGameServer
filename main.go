@@ -76,10 +76,10 @@ func (s *Server) readLoop(conn net.Conn) {
 			playermodule.AllSessions.UpdatePlayerPos(1,matchSession.PlayerPos[1],sessionId)
 			conn.Write([]byte(matchSession.PlayerPos[0]))
 		}
-		s.msgChan <- Message{
-			from:    conn.RemoteAddr().String(),
-			payload: buf[:n],
-		}
+		// s.msgChan <- Message{
+		// 	from:    conn.RemoteAddr().String(),
+		// 	payload: buf[:n],
+		// }
 	}
 }
 
@@ -87,11 +87,11 @@ func main() {
 	playermodule.GenAllSessions()
 	server := NewServer(":3000")
 
-	go func() {
-		for msg := range server.msgChan {
-			fmt.Printf("Recieved message from connection (%s):%s\n", msg.from, string(msg.payload))
-		}
-	}()
+	// go func() {
+	// 	for msg := range server.msgChan {
+	// 		fmt.Printf("Recieved message from connection (%s):%s\n", msg.from, string(msg.payload))
+	// 	}
+	// }()
 
 	log.Fatal(server.Start())
 }
